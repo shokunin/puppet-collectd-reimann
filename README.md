@@ -1,7 +1,7 @@
 puppet-collectd-riemann
 =======================
 
-This sets up two VMS
+This sets up two Vagrant boxes for the purpose of testing [riemann monitoring system](http://riemann.io)
 
 client
 ------
