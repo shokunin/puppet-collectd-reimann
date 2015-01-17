@@ -25,4 +25,30 @@ class riemann::packages inherits riemann {
     require => Exec['uncompress_riemann'],
   }
 
+  package { 'libxml2-dev':
+    ensure  => installed
+  }
+
+  package { 'libxslt1-dev':
+    ensure  => installed
+  }
+
+  package { 'ruby1.9.1':
+    ensure => installed,
+    require => [ File['/opt/riemann'], Package['libxslt1-dev', 'libxml2-dev'] ]
+  }
+
+  package { 'ruby1.9.1-dev':
+    ensure  => installed,
+    require => Package['ruby2.0'],
+  }
+
+  $gemlist=['riemann-client', 'riemann-tools', 'riemann-dash']
+
+  package { $gemlist:
+    ensure   => installed,
+    provider => gem,
+    require  => Package['ruby2.0-dev'],
+  }
+
 }

@@ -5,6 +5,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "server" do |server|
     server.vm.box = "ubuntu/trusty64"
     server.vm.host_name = 'riemann'
+    server.vm.network "forwarded_port", guest: 4567, host: 4567
+    server.vm.network "forwarded_port", guest: 5555, host: 5555
     server.vm.network "private_network", ip: "172.16.3.101"
     server.vm.synced_folder "puppet/modules", "/tmp/vagrant-puppet/puppet/modules"
     server.vm.provision :puppet do |puppet|

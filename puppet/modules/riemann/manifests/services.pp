@@ -9,4 +9,11 @@ class riemann::services inherits riemann {
     require        => Class['riemann::configure', 'riemann::packages'],
   }
 
+  runit::services::runner { 'riemann-dash':
+    runner_command => '/usr/local/bin/riemann-dash /opt/riemann/etc/dashboard.config',
+    runner_rundir  => '/opt/riemann',
+    runner_log_dir => '/var/log/riemann-dash',
+    require        => Class['riemann::configure', 'riemann::packages'],
+  }
+
 }
