@@ -1,0 +1,9 @@
+#!/bin/bash
+##########################################################################
+#                       Puppet Controlled
+##########################################################################
+PATH=/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin; export PATH
+if [ ! -d <%= @runit_log_dir %> ]; then
+	mkdir -p <%= @runit_log_dir %>
+fi
+exec svlogd -tt . <%= @runit_log_dir %>

@@ -1,0 +1,10 @@
+
+---
+:backends:
+  - yaml
+:hierarchy:
+  - "%{fqdn}"
+  - test
+:yaml:
+  :datadir: 'spec/fixtures/hiera'
+:merge_behavior: deeper

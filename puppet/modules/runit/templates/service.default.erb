@@ -1,0 +1,25 @@
+#!/bin/bash
+###########################################################################
+#                       Puppet Controlled
+###########################################################################
+echo "Starting <%= @service_name %> as <%= @runner_user %>"
+export SHELL=/bin/bash
+PATH=/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin; export PATH
+export USER=<%= @runner_user %>
+export LANG=en_US.UTF-8
+<% if @runner_rundir =~ /^\// -%>
+cd <%= @runner_rundir %>
+<% end -%>
+<% if @runner_user != "root" -%>
+<% if @runner_ulimit != '' -%>
+ulimit <%= @runner_ulimit %>
+<% end -%>
+export HOME=/home/<%= @runner_user %>
+exec chpst -u <%= @runner_user %> <%= @runner_command %>  2>&1
+<% else -%>
+export HOME=/root
+<% if @runner_ulimit != '' -%>
+ulimit <%= @runner_ulimit %>
+<% end -%>
+exec <%= @runner_command %> 2>&1
+<% end -%>
