@@ -33,6 +33,14 @@ class riemann::packages inherits riemann {
     ensure  => installed
   }
 
+  package { 'ruby2.0':
+    ensure => installed,
+  }
+
+  package { 'ruby2.0-dev':
+    ensure => installed,
+  }
+
   package { 'ruby1.9.1':
     ensure => installed,
     require => [ File['/opt/riemann'], Package['libxslt1-dev', 'libxml2-dev'] ]
@@ -48,7 +56,7 @@ class riemann::packages inherits riemann {
   package { $gemlist:
     ensure   => installed,
     provider => gem,
-    require  => Package['ruby2.0-dev'],
+    require  => Package['ruby2.0-dev','ruby1.9.1-dev'],
   }
 
 }

@@ -1,11 +1,11 @@
 class logstash::packages inherits logstash {
 
-  apt::key { "logstash_repo":
-  #key        => "0211F6D4",
+  apt::key { "GPG-KEY-elasticsearch":
+    key        => "D88E42B4",
     key_source => "http://packages.elasticsearch.org/GPG-KEY-elasticsearch",
   }
 
-  apt::source { 'logstash_repo':
+  apt::source { 'logstash':
     location     => 'http://packages.elasticsearch.org/logstash/1.4/debian',
     include_src  => false,
     release      => "stable",
@@ -14,13 +14,7 @@ class logstash::packages inherits logstash {
 
   package { 'logstash':
     ensure  => installed, 
-    require => Apt::Source['logstash_repo'],
+    require => Apt::Source['logstash'],
   }
   
-  file { '/etc/logstash/conf.d/01-logstash_riemann.conf':
-    ensure  => present,
-    source  => 'puppet:///modules/logstash_forwarder/logstash_riemann.conf',
-    require => Package['logstash'],
-  }
-
 }
