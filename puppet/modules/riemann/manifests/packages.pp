@@ -1,15 +1,14 @@
 class riemann::packages inherits riemann {
 
-  package { 'openjdk-7-jre':
-    ensure  => installed
-  }
+  include java
+
 
   exec { 'download_riemann':
     refreshonly => false,
     command     => '/usr/bin/wget https://aphyr.com/riemann/riemann-0.2.8.tar.bz2',
     cwd         => '/opt',
     creates     => '/opt/riemann-0.2.8.tar.bz2',
-    require     => [Class['unix_base::common'],Package['openjdk-7-jre']],
+    require     => Class['unix_base::common', 'java'],
   }
 
   exec { 'uncompress_riemann':
@@ -40,15 +39,15 @@ class riemann::packages inherits riemann {
 
   package { 'ruby1.9.1-dev':
     ensure  => installed,
-    require => Package['ruby2.0'],
+    require => Package['ruby1.9.1'],
   }
 
-  $gemlist=['riemann-client', 'riemann-tools', 'riemann-dash']
-
-  package { $gemlist:
-    ensure   => installed,
-    provider => gem,
-    require  => Package['ruby2.0-dev'],
-  }
+  #  $gemlist=['riemann-client', 'riemann-tools', 'riemann-dash']
+  #
+  #  package { $gemlist:
+  #    ensure   => installed,
+  #    provider => gem,
+  #    require  => Package['ruby1.9.1-dev'],
+  #  }
 
 }
