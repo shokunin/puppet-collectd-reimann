@@ -42,12 +42,12 @@ class riemann::packages inherits riemann {
     require => Package['ruby1.9.1'],
   }
 
-  #  $gemlist=['riemann-client', 'riemann-tools', 'riemann-dash']
-  #
-  #  package { $gemlist:
-  #    ensure   => installed,
-  #    provider => gem,
-  #    require  => Package['ruby1.9.1-dev'],
-  #  }
+  $gemlist=['riemann-client', 'riemann-tools', 'riemann-dash']
+ 
+  package { $gemlist:
+    ensure   => installed,
+    provider => gem,
+    require  => Package['ruby1.9.1-dev'],
+  }
 
 }
