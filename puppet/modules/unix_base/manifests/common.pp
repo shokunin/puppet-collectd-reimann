@@ -2,7 +2,7 @@ class unix_base::common inherits unix_base {
 
   if $::osfamily == 'Debian' {
 
-    file { '/tmp/update':
+    file { '/var/tmp/update':
       ensure => present,
       notify => Exec['apt-get-update-tmp'],
     }

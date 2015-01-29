@@ -17,10 +17,22 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end #server
 
-  config.vm.define "client" do |client|
+  config.vm.define "client1" do |client|
     client.vm.box = "ubuntu/trusty64"
-    client.vm.host_name = 'client'
+    client.vm.host_name = 'client1'
     client.vm.network "private_network", ip: "172.16.3.102"
+    client.vm.synced_folder "puppet/modules", "/tmp/vagrant-puppet/puppet/modules"
+    client.vm.provision :puppet do |puppet|
+      puppet.manifests_path = "puppet/manifests"
+      puppet.options = ["--modulepath", "/tmp/vagrant-puppet/puppet/modules"]
+      puppet.manifest_file = "client.pp"
+    end
+  end #client
+
+  config.vm.define "client2" do |client|
+    client.vm.box = "ubuntu/trusty64"
+    client.vm.host_name = 'client2'
+    client.vm.network "private_network", ip: "172.16.3.103"
     client.vm.synced_folder "puppet/modules", "/tmp/vagrant-puppet/puppet/modules"
     client.vm.provision :puppet do |puppet|
       puppet.manifests_path = "puppet/manifests"
