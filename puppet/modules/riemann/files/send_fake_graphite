@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 require 'socket'
 
-conn = TCPSocket.new 'localhost', 2007
+conn = TCPSocket.new 'localhost', 2003
 conn.puts "#{ARGV[0]} #{ARGV[1]} #{Time.now.to_i} \n"
 conn.close

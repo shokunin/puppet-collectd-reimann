@@ -50,4 +50,13 @@ class riemann::packages inherits riemann {
     require  => Package['ruby1.9.1-dev'],
   }
 
+  file { '/usr/local/bin/send_fake_graphite':
+    ensure => present,
+    owner  => root,
+    group  => root,
+    mode   => '0755',
+    source => 'puppet:///modules/riemann/send_fake_graphite',
+  }
+  
+
 }

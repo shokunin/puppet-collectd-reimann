@@ -4,7 +4,7 @@ class riemann::configure inherits riemann {
     owner   => root,
     group   => root,
     mode    => '0644',
-    source  => 'puppet:///modules/riemann/riemann.config',
+    source  => 'puppet:///modules/riemann/riemann.clj',
     require => Class['riemann::packages'],
     notify  => Class['riemann::services'],
   }
