@@ -36,19 +36,36 @@
   ; All streams go here
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;  Time window example
-  ;  if there are no events then the causes an NPE
+  ;  Look at the number of HTTP requess in 10 seconds that have
+  ;  and HTTP response code of 400 or more
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (streams
     (default { :ttl 60 :severity "major" }
-      (where (and (service #"web_hit_404$") (not (expired? event))) 
-        (fixed-time-window 10
-          (combine riemann.folds/sum
-            (where (> metric 5.0)
-               (smap #(assoc % :service "404's.critical" :state "critical" :tags ["alert"]) reinject)
-            (else
-               (smap #(assoc % :service "404's.critical" :state "ok" :tags ["alert"]) reinject)
-              )))
-  ))))
+      (where (and (= service "web_hit") (not (expired? event))) 
+          (by [:service]
+            (fixed-time-window 10
+              (smap (fn [events]
+              (let [ web_errors (count (filter #(< 399 (:metric %)) events)) ]
+                 {:service "Web Errors"
+                  :severity "critical"
+                  :host "service"
+                  :tags ["alert"]
+                  :metric web_errors
+                  :ttl 60 
+                  :description "Got more than 20 HTTP errors in 10 seconds"
+                  :time (get (get (to-array (take-last 1 events )) 0) :time)
+                  :state   (condp < web_errors
+                             20 "critical"
+                                "ok")}))
+              reinject
+              ))))
+      ; Calculate the 95-th percentil of web performance every 10 seconds
+      ; creates a new service "web_performance 0.95"
+      (where (and (= service "web_performance") (not (expired? event))) 
+             (percentiles 10 [ 0.95 ]
+                          index
+             )))
+    )
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;  Go off when a metric hits a certain point and stays above it for a certain
   ;  count, change the state and re-inject it so the pagerduty things below
@@ -70,16 +87,8 @@
                   :state   (condp < fraction
                              0.1 "critical"
                                "ok")}))
-               ;prn
                reinject)))
   )))
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ; collectd debugging
-  (streams
-    (default :ttl 60
-      (tagged-all ["collectd" "debug"]
-                  prn
-                  )))
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ; collectd based alerts
   (streams
@@ -87,19 +96,23 @@
       (tagged-all ["collectd" "prod"]
         index
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        ; show how many cpus are running hot across all servers
+          (where (= service "cpu-0.cpu-user")
+            (by [:service] (coalesce 30
+                    (fn [event] (info "HOT_HOST_COUNT" (count (filter #(< 50 (:metric %)) event))))
+                    )))
+        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         ; alert on high load
         (where (service #"load.load.midterm")
           (where (>= metric 25.0)
             (where (>= metric 35.0)
-               (smap #(assoc % :service "load.critical" :state "critical" :severity "critical" :tags ["alert"]) reinject)
+               (smap #(assoc % :service "MidTerm Load" :state "critical" :severity "critical" :tags ["alert"]) reinject)
             (else
-               (smap #(assoc %  :service "load.major" :state "critical" :severity "major" :tags ["alert"]) reinject)
+               (smap #(assoc %  :service "MidTerm Load" :state "critical" :severity "major" :tags ["alert"]) reinject)
             ))
           )
           (where (< metric 25.0 )
-             (smap #(assoc %  :service "load.critical" :state "ok" :severity "critical" :tags ["alert"]) reinject)
-             (smap #(assoc %  :service "load.major" :state "ok" :severity "major" :tags ["alert"]) reinject)
-             (smap #(assoc %  :service "load.minor" :state "ok" :severity "minor" :tags ["alert"]) reinject)
+             (smap #(assoc %  :service "MidTerm Load" :state "ok" :severity "critical" :tags ["alert"]) reinject)
           )
         )
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -114,22 +127,40 @@
   (streams
     (tagged "alert"
     (where ( not ( expired? event ) )
+    ; We want to index all of the alerts so we can view them in the dashboard
     index
+    ;; This takes all major or critical alerts and creates a stoplight if there's more than 1
+    (where (or (= (:severity event) "critical") (= (:severity event) "major") )
+    (by [:severity] (coalesce 30
+      (smap (fn [events]
+         (let [ crit_count (count (filter #(= "critical" (:state %)) events))]
+           {:service "STOPLIGHT"
+            :host "STOPLIGHT"
+            :ttl 60
+            :time (get (get (to-array (take-last 1 events )) 0) :time)
+            :metric crit_count
+            :state   (condp > crit_count
+                       1 "ok"
+                       3 "warning"
+                       "critical")
+                       }))
+            index
+            ))))
     (by [:host :service]
     (default {:state "ok" :ttl 60}
     (changed-state {:init "ok"}
 
-    (where (service #".+.critical")
+    (where (= (:severity event) "critical")
       ( fn [event] (warn "CRITICAL (PagerDuty) STATE CHANGED: " event) )
       ;(:trigger pager )
            )
 
-    (where (service #".+.major")
+    (where (= (:severity event) "major")
       ( fn [event] (warn "MAJOR (Hipchat w/ Mention) STATE CHANGED: " event) )
       ;(with { :description "Database load is critical @all"} hc-hourly)  
            )
 
-    (where (service #".+.minor")
+    (where (= (:severity event) "minor")
       ( fn [event] (warn "MINOR (Hipchat) STATE CHANGED: " event) )
       ;(with { :description "minor change"} hc-hourly)  
            )

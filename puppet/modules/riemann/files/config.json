@@ -1,0 +1,184 @@
+{
+  "server": "127.0.0.1:5556",
+  "server_type": "ws",
+  "workspaces": [
+    {
+      "name": "Stoplight",
+      "view": {
+        "type": "Balloon",
+        "weight": 1,
+        "id": "0f841d474bb888ac0bd4d306f09fa0b265318e1e",
+        "version": 7,
+        "child": {
+          "type": "VStack",
+          "weight": 1,
+          "id": "ee13c887481cb32ea33066cdb2d17a33aaa06bea",
+          "version": 7,
+          "children": [
+            {
+              "type": "Gauge",
+              "weight": 1,
+              "id": "d05a887925449acd362bf88434b822417a67cef2",
+              "version": 6,
+              "title": "StopLight",
+              "query": "'( host = \"STOPLIGHT\" )'"
+            },
+            {
+              "type": "List",
+              "weight": 1,
+              "id": "596a8273791a42e94507b7d0eb7fa9f397edd189",
+              "version": 1,
+              "title": "Errors",
+              "query": "'( state = \"critical\" )'"
+            }
+          ]
+        }
+      },
+      "id": "30ea9ae3aebe87b62a8461214d67aefb65f0abf8"
+    },
+    {
+      "name": "Gauge And Help",
+      "view": {
+        "type": "Balloon",
+        "weight": 1,
+        "id": "1cd8f28aed8821b5c0d660227eaebcbbbfbf18ff",
+        "version": 4,
+        "child": {
+          "type": "VStack",
+          "weight": 1,
+          "id": "1966c189c4b5f8ef4187312429cfd8e8c3930f58",
+          "version": 4,
+          "children": [
+            {
+              "type": "Dial",
+              "weight": 1,
+              "id": "a145aaa2e0398a060e5b51ea2f21025a9e702ab6",
+              "version": 4,
+              "title": "Riemann CPU Idle",
+              "query": "'( service = \"cpu-0.cpu-idle\" and host = \"riemann\" )'",
+              "commaSeparateThousands": "on",
+              "max": "100"
+            },
+            {
+              "type": "Help"
+            }
+          ]
+        }
+      },
+      "id": "3a64e462c9f7010bc164ad7ea1576f84f105bc90"
+    },
+    {
+      "name": "Grid",
+      "view": {
+        "type": "Balloon",
+        "weight": 1,
+        "id": "f4e7573488f39a746807c04c6cd59e539b316b13",
+        "version": 5,
+        "child": {
+          "type": "VStack",
+          "weight": 1,
+          "id": "06be0d0e10d4f0c596b5c35813d5431c8ae7e485",
+          "version": 5,
+          "children": [
+            {
+              "type": "Grid",
+              "weight": 1,
+              "id": "99b46a7cafe4d28b1b7a9c118d32c21639360fee",
+              "version": 3,
+              "title": "CPU Usage",
+              "query": "'( service =~ \"memory%\" )'",
+              "max": "",
+              "rows": "",
+              "cols": "",
+              "row_sort": "lexical",
+              "col_sort": "lexical"
+            },
+            {
+              "type": "TimeSeries",
+              "weight": 1,
+              "id": "00f6cafd164b648cf2d886d0de3a6b625d7c1528",
+              "version": 2,
+              "title": "Memory Usage",
+              "delay": "",
+              "speed": "",
+              "query": "'( service =~ \"cpu%user\") '",
+              "opacity": "2",
+              "lineWidth": "2"
+            }
+          ]
+        }
+      },
+      "id": "641e39d5749af5abefb3a3349ef5f1d9f9c22f77"
+    },
+    {
+      "name": "Scrolling Log Example",
+      "view": {
+        "type": "Balloon",
+        "weight": 1,
+        "id": "1775026ab71c92fe8502524b03d0e8b5c55b0504",
+        "version": 2,
+        "child": {
+          "type": "VStack",
+          "weight": 1,
+          "id": "c06881051a6caf3f14ed20ee76db1c0904c40f52",
+          "version": 2,
+          "children": [
+            {
+              "type": "Log",
+              "weight": 1,
+              "id": "508965b93c198f8810b8d92dd49ed55ea0d5ba54",
+              "version": 2,
+              "title": "Riemann",
+              "query": "'( service =~ \"riemann server tcp%\" )'",
+              "lines": "25"
+            }
+          ]
+        }
+      },
+      "id": "bad6df977a0a5503c7e713238b4ad3f8784e2b49"
+    },
+    {
+      "name": "Grid and Graph",
+      "view": {
+        "type": "Balloon",
+        "weight": 1,
+        "id": "f4e7573488f39a746807c04c6cd59e539b316b13",
+        "version": 5,
+        "child": {
+          "type": "VStack",
+          "weight": 1,
+          "id": "06be0d0e10d4f0c596b5c35813d5431c8ae7e485",
+          "version": 5,
+          "children": [
+            {
+              "type": "Grid",
+              "weight": 1,
+              "id": "99b46a7cafe4d28b1b7a9c118d32c21639360fee",
+              "version": 3,
+              "title": "CPU Usage",
+              "query": "'( service =~ \"memory%\" )'",
+              "max": "",
+              "rows": "",
+              "cols": "",
+              "row_sort": "lexical",
+              "col_sort": "lexical"
+            },
+            {
+              "type": "TimeSeries",
+              "weight": 1,
+              "id": "00f6cafd164b648cf2d886d0de3a6b625d7c1528",
+              "version": 2,
+              "title": "Memory Usage",
+              "delay": "",
+              "speed": "",
+              "query": "'( service =~ \"cpu%user\") '",
+              "opacity": "2",
+              "lineWidth": "2"
+            }
+          ]
+        }
+      },
+      "id": "641e39d5749af5abefb3a3349ef5f1d9f9c22f77"
+    }
+  ]
+}

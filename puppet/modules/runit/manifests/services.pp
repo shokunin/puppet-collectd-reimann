@@ -36,52 +36,59 @@ class runit::services{
       require => Class['runit::packages']
     }
 
-    file { "/etc/service/${service_name}":
+    file { "/etc/sv/${service_name}":
       ensure  => directory,
       owner   => root,
       group   => root,
       require => Class['runit::packages']
     }
 
-    file { "/etc/service/${service_name}/log":
+    file { "/etc/sv/${service_name}/log":
       ensure  => directory,
       owner   => root,
       group   => root,
-      require => [File["/etc/service/${service_name}"], File[$runit_log_dir]],
+      require => [File["/etc/sv/${service_name}"], File[$runit_log_dir]],
     }
 
-    file { "/etc/service/${service_name}/supervise":
+    file { "/etc/sv/${service_name}/supervise":
       ensure  => directory,
       owner   => root,
       group   => root,
       mode    => '0700',
-      require => [File["/etc/service/${service_name}"]],
+      require => [File["/etc/sv/${service_name}"]],
     }
 
-    file { "/etc/service/${service_name}/run":
+    file { "/etc/sv/${service_name}/run":
       ensure  => file,
       owner   => root,
       group   => root,
       mode    => '0755',
       content => template("runit/service.${runner_template}.erb"),
-      require => File["/etc/service/${service_name}"],
+      require => File["/etc/sv/${service_name}"],
     }
 
-    file { "/etc/service/${service_name}/log/run":
+    file { "/etc/sv/${service_name}/log/run":
       ensure  => file,
       owner   => root,
       group   => root,
       mode    => '0755',
       content => template("runit/log.${runner_template}.erb"),
-      require => File["/etc/service/${service_name}/log"],
+      require => File["/etc/sv/${service_name}/log"],
+    }
+
+    file { "/etc/service/${service_name}":
+      ensure => link,
+      target => "/etc/sv/${service_name}",
     }
 
     service { $service_name:
       ensure   => running,
+      enable   => true,
       provider => runit,
       path     => '/etc/service',
-      require  => [ File["/etc/service/${service_name}/log/run"],
-                    File["/etc/service/${service_name}/supervise"],
+      require  => [ File["/etc/sv/${service_name}/log/run"],
+                    File["/etc/sv/${service_name}/supervise"],
+                    File["/etc/service/${service_name}"],
                     Class['runit::packages']],
     }
 
