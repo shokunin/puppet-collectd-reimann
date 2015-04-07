@@ -115,6 +115,42 @@
              (smap #(assoc %  :service "MidTerm Load" :state "ok" :severity "critical" :tags ["alert"]) reinject)
           )
         )
+
+        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        ; map two events to a third and run over a time period
+        (where (or (service #"redis-.+.counter-keyspace_hits") (service #"redis-.+.counter-keyspace_misses"))
+               ( by [:host]
+                (project [(service "redis-cacheops.counter-keyspace_hits")
+                          (service "redis-cacheops.counter-keyspace_misses")]
+                         (fn [[hits misses]]
+                           (let [ hit_ratio (/ (* 100 (:metric hits)) (+ (:metric misses) (:metric hits)))]
+                           ( reinject {:service "redis cache hit ratio"
+                                       :host    (:host hits)
+                                       :time    (max (:time hits) (:time misses))
+                                       :metric  hit_ratio
+                                       :tags  ["redis_hit_ratio", "prod", "collectd"]
+                                   })
+                           ))
+               )))
+       (where (= service "redis cache hit ratio")
+              (by [:host]
+                (fixed-time-window 30
+                  (smap (fn [events]
+                    (let [fraction (/ (count (filter #(> 25 (:metric %)) events))
+                               (count events))]
+                      {:service "Cache Hit ratio < 25%"
+                       :host (get (get events 0) :host)
+                       :metric fraction
+                       :last_metric (get (get (to-array (take-last 1 events )) 0) :metric)
+                       :time (get (get (to-array (take-last 1 events )) 0) :time)
+                       :severity "major"
+                       :tags ["alert"]
+                       :state   (condp < fraction
+                                  0.9 "critical"
+                                    "ok")}))
+                        reinject
+                  ))))
+
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
