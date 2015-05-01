@@ -49,7 +49,7 @@
                  {:service "Web Errors"
                   :severity "critical"
                   :host "service"
-                  :tags ["alert"]
+                  :tags ["alert", "sla"]
                   :metric web_errors
                   :ttl 60 
                   :description "Got more than 20 HTTP errors in 10 seconds"
@@ -120,8 +120,8 @@
         ; map two events to a third and run over a time period
         (where (or (service #"redis-.+.counter-keyspace_hits") (service #"redis-.+.counter-keyspace_misses"))
                ( by [:host]
-                (project [(service "redis-cacheops.counter-keyspace_hits")
-                          (service "redis-cacheops.counter-keyspace_misses")]
+                (project [(service "redis-webcache.counter-keyspace_hits")
+                          (service "redis-webcache.counter-keyspace_misses")]
                          (fn [[hits misses]]
                            (let [ hit_ratio (/ (* 100 (:metric hits)) (+ (:metric misses) (:metric hits)))]
                            ( reinject {:service "redis cache hit ratio"
@@ -144,7 +144,7 @@
                        :last_metric (get (get (to-array (take-last 1 events )) 0) :metric)
                        :time (get (get (to-array (take-last 1 events )) 0) :time)
                        :severity "major"
-                       :tags ["alert"]
+                       :tags ["alert", "sla"]
                        :state   (condp < fraction
                                   0.9 "critical"
                                     "ok")}))
