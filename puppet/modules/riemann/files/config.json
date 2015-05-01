@@ -68,49 +68,6 @@
       "id": "3a64e462c9f7010bc164ad7ea1576f84f105bc90"
     },
     {
-      "name": "Grid",
-      "view": {
-        "type": "Balloon",
-        "weight": 1,
-        "id": "f4e7573488f39a746807c04c6cd59e539b316b13",
-        "version": 5,
-        "child": {
-          "type": "VStack",
-          "weight": 1,
-          "id": "06be0d0e10d4f0c596b5c35813d5431c8ae7e485",
-          "version": 5,
-          "children": [
-            {
-              "type": "Grid",
-              "weight": 1,
-              "id": "99b46a7cafe4d28b1b7a9c118d32c21639360fee",
-              "version": 3,
-              "title": "CPU Usage",
-              "query": "'( service =~ \"memory%\" )'",
-              "max": "",
-              "rows": "",
-              "cols": "",
-              "row_sort": "lexical",
-              "col_sort": "lexical"
-            },
-            {
-              "type": "TimeSeries",
-              "weight": 1,
-              "id": "00f6cafd164b648cf2d886d0de3a6b625d7c1528",
-              "version": 2,
-              "title": "Memory Usage",
-              "delay": "",
-              "speed": "",
-              "query": "'( service =~ \"cpu%user\") '",
-              "opacity": "2",
-              "lineWidth": "2"
-            }
-          ]
-        }
-      },
-      "id": "641e39d5749af5abefb3a3349ef5f1d9f9c22f77"
-    },
-    {
       "name": "Scrolling Log Example",
       "view": {
         "type": "Balloon",
@@ -179,6 +136,37 @@
         }
       },
       "id": "641e39d5749af5abefb3a3349ef5f1d9f9c22f77"
+    },
+    {
+      "name": "All Alerts",
+      "view": {
+        "type": "Balloon",
+        "weight": 1,
+        "id": "fc2c7a44dd64c7618383edfc3808d8922f8ecf96",
+        "version": 2,
+        "child": {
+          "type": "VStack",
+          "weight": 1,
+          "id": "cba2c7b1b8acc4e2db19af1909bdd4ca22c32ba7",
+          "version": 2,
+          "children": [
+            {
+              "type": "Grid",
+              "weight": 1,
+              "id": "dd8b2177d28df6f36178314f9c62879a6e8832aa",
+              "version": 2,
+              "title": "All Alerts",
+              "query": "'( tagged =~ \"alert\" )'",
+              "max": "",
+              "rows": "",
+              "cols": "",
+              "row_sort": "lexical",
+              "col_sort": "lexical"
+            }
+          ]
+        }
+      },
+      "id": "228947c2637995efc8cbb01c0bb034b9fd8c391b"
     }
   ]
 }
