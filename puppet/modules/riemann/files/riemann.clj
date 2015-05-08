@@ -19,14 +19,17 @@
                    :protocol :tcp
                    :parser-fn
    (fn [{:keys [service] :as event}]
-     ; collectd.prod.client1.memory.memory-free
-     ; collectd.prod.client1.foo.bar.baz.bash
-     (let [[source environment hostname ] (clojure.string/split service #"\." )]
+     ; collectd.prod.webserver.client1.memory.memory-free
+     ; collectd.prod.webserver.client1.foo.bar.baz.bash
+     (let [[source environment application hostname ] (clojure.string/split service #"\." )]
        {
         :host (clojure.string/replace hostname #"_" ".")
-        :service (clojure.string/join "." (subvec (clojure.string/split service #"\.") 3))
+        :service (clojure.string/join "." (subvec (clojure.string/split service #"\.") 4))
         :metric (:metric event)
         :tags [source, environment]
+        :environment environment
+        :application application
+        :source source
         :time (:time event)
         :ttl 30}))))
 ; Expire old events from the index every 60 seconds.
@@ -96,11 +99,26 @@
       (tagged-all ["collectd" "prod"]
         index
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        ; show how many cpus are running hot across all servers
+        ; Measure the CPU usage across all servers and alert if > 40% are over 50%
           (where (= service "cpu-0.cpu-user")
-            (by [:service] (coalesce 30
-                    (fn [event] (info "HOT_HOST_COUNT" (count (filter #(< 50 (:metric %)) event))))
-                    )))
+            (by [:service :application] (coalesce 30
+                    (smap (fn [events]
+                      ( let [ percent (/ (* 100 (count (filter #(< 50 (:metric %)) events)))
+                                          (count events))]
+                        { :service "Environment High CPU Usage"
+                          :host (get (get events 0) :application)
+                          :metric percent
+                          :time (get (get (to-array (take-last 1 events )) 0) :time)
+                          :severity "critical"
+                          :tags ["alert", "sla"]
+                          :state   (condp < percent
+                             40 "critical"
+                               "ok")
+                        }
+                    ))
+                    reinject
+                    index
+            ))))
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         ; alert on high load
         (where (service #"load.load.midterm")
@@ -166,11 +184,12 @@
     ; We want to index all of the alerts so we can view them in the dashboard
     index
     ;; This takes all major or critical alerts and creates a stoplight if there's more than 1
-    (where (or (= (:severity event) "critical") (= (:severity event) "major") )
+    (tagged "sla"
+    (where (or (= (:severity event) "critical") (= (:severity event) "major") ) 
     (by [:severity] (coalesce 30
       (smap (fn [events]
          (let [ crit_count (count (filter #(= "critical" (:state %)) events))]
-           {:service "STOPLIGHT"
+           {:service "SLA STOPLIGHT"
             :host "STOPLIGHT"
             :ttl 60
             :time (get (get (to-array (take-last 1 events )) 0) :time)
@@ -181,7 +200,7 @@
                        "critical")
                        }))
             index
-            ))))
+            )))))
     (by [:host :service]
     (default {:state "ok" :ttl 60}
     (changed-state {:init "ok"}
