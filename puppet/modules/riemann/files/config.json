@@ -21,7 +21,7 @@
               "id": "d05a887925449acd362bf88434b822417a67cef2",
               "version": 6,
               "title": "StopLight",
-              "query": "'( host = \"STOPLIGHT\" )'"
+              "query": "( host = \"STOPLIGHT\" )"
             },
             {
               "type": "List",
@@ -29,7 +29,7 @@
               "id": "596a8273791a42e94507b7d0eb7fa9f397edd189",
               "version": 1,
               "title": "Errors",
-              "query": "'( state = \"critical\" )'"
+              "query": "( state = \"critical\" )"
             }
           ]
         }
@@ -55,7 +55,7 @@
               "id": "a145aaa2e0398a060e5b51ea2f21025a9e702ab6",
               "version": 4,
               "title": "Riemann CPU Idle",
-              "query": "'( service = \"cpu-0.cpu-idle\" and host = \"riemann\" )'",
+              "query": "( service = \"cpu-0.cpu-idle\" and host = \"riemann\" )",
               "commaSeparateThousands": "on",
               "max": "100"
             },
@@ -86,7 +86,7 @@
               "id": "508965b93c198f8810b8d92dd49ed55ea0d5ba54",
               "version": 2,
               "title": "Riemann",
-              "query": "'( service =~ \"riemann server tcp%\" )'",
+              "query": "( service =~ \"riemann server tcp%\" )",
               "lines": "25"
             }
           ]
@@ -113,7 +113,7 @@
               "id": "99b46a7cafe4d28b1b7a9c118d32c21639360fee",
               "version": 3,
               "title": "CPU Usage",
-              "query": "'( service =~ \"memory%\" )'",
+              "query": "( service =~ \"memory%\" )",
               "max": "",
               "rows": "",
               "cols": "",
@@ -128,7 +128,7 @@
               "title": "Memory Usage",
               "delay": "",
               "speed": "",
-              "query": "'( service =~ \"cpu%user\") '",
+              "query": "( service =~ \"cpu%user\") ",
               "opacity": "2",
               "lineWidth": "2"
             }
@@ -156,7 +156,7 @@
               "id": "dd8b2177d28df6f36178314f9c62879a6e8832aa",
               "version": 2,
               "title": "All Alerts",
-              "query": "'( tagged =~ \"alert\" )'",
+              "query": "( tagged =~ \"alert\" )",
               "max": "",
               "rows": "",
               "cols": "",
