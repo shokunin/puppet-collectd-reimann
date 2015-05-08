@@ -16,7 +16,7 @@ LoadPlugin write_graphite
   <Carbon>
      Host "172.16.3.101"
      Port "2003"
-     Prefix "collectd.prod."
+     Prefix "collectd.prod.riemann."
      EscapeCharacter "_"
      StoreRates true
      AlwaysAppendDS false
