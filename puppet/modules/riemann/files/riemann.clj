@@ -99,9 +99,9 @@
       (tagged-all ["collectd" "prod"]
         index
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        ; Measure the CPU usage across all servers and alert if > 40% are over 50%
           (where (= service "cpu-0.cpu-user")
-            (by [:service :application] (coalesce 30
+            (by [:service :application] (coalesce 10
+                    ; Measure the CPU usage across all servers and alert if > 40% are over 50%
                     (smap (fn [events]
                       ( let [ percent (/ (* 100 (count (filter #(< 50 (:metric %)) events)))
                                           (count events))]
@@ -118,7 +118,19 @@
                     ))
                     reinject
                     index
-            ))))
+                  )
+                  ; Average together ALL CPU usage 
+                  (smap folds/mean
+                    (smap (fn [events]
+                        { :service "Average CPU Usage"
+                          :host (get (get events 0) :application)
+                          :time (get (get (to-array (take-last 1 events )) 0) :time)
+                          :severity "critical"
+                          :tags ["alert", "sla"]
+                          :state "ok"
+                        }
+                            )))
+        )))
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         ; alert on high load
         (where (service #"load.load.midterm")
@@ -196,7 +208,7 @@
             :metric crit_count
             :state   (condp > crit_count
                        1 "ok"
-                       3 "warning"
+                       2 "warning"
                        "critical")
                        }))
             index
