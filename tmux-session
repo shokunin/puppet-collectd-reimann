@@ -1,0 +1,19 @@
+#!/bin/bash
+
+SESSION_NAME=`pwd |xargs basename`
+
+tmux has-session -t ${SESSION_NAME}
+
+if [ $? != 0 ]; then
+	window=1
+	tmux new-session -s ${SESSION_NAME} -n "Vagrant" -d
+	tmux new-window -n "Vagrant" -t $SESSION_NAME 
+	for i in `grep config.vm.define Vagrantfile  |awk '{print $2}' |sed -e s/\"//g`; do
+		tmux new-window -n ${i} -t $SESSION_NAME "vagrant ssh $i"
+		window=$((window+1))
+	done
+	tmux kill-window -t ${SESSION_NAME}:1
+	tmux select-window -t ${SESSION_NAME}:1
+fi
+
+tmux attach -t ${SESSION_NAME}
