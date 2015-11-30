@@ -53,5 +53,5 @@ Several alerts have been set up as examples:
 
 | Alert     | Explanation  | How to Trigger  | How to view in Dashboard |
 |-----------|--------------|-----------------|--------------------------|
-|Web Errors | If in a 10 second window more than 20 requests with an HTTP status code of 400 or more are received | On one of the client boxes run "siege -f /opt/siege/10_percent_error.config"  | http://localhost:4567/#All Alerts |
-| CPU Usage | If in the cpu is high on a box will alert | On any box run "burnMMX"  | http://localhost:4567/#All Alerts |
+|Web Errors | If in a 10 second window more than 20 requests with an HTTP status code of 400 or more are received | On one of the client boxes run "siege -f /opt/siege/10_percent_error.config"  | [All Alerts Dashboard](http://localhost:4567/#All Alerts) |
+| CPU Usage | If in the cpu is high on a box will alert | On any box run "burnMMX"  | [All Alerts Dashboard](http://localhost:4567/#All Alerts) |
