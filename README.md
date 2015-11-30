@@ -15,10 +15,10 @@ server
 Runs the following processes:
 
 	- collectd: 		submits stats to the localhost
-	- carbon-c-relay:	takes graphite input and sends a copy to riemann
 	- riemann:		runs the riemann monitoring server with a basic configuration
 	- nginx:	        client system runs Nginx	
 	- logstash:	        takes nginx input and sends events to riemann	
+	- carbon-c-relay:	takes graphite input and sends a copy to riemann
 
 data flow
 ---------
